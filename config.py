@@ -6,8 +6,6 @@ class Default:
 class Development(Default):
     DEBUG = True
     DATABASE = '/tmp/arch_lingr_bot.db'
-    USERNAME = 'admin'
-    PASSWORD = 'r7Hjxf80'
 
 class Production(Default):
     pass
