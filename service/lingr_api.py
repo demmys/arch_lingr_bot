@@ -4,15 +4,15 @@ import urllib
 import dateutil
 
 class LingrEvent:
-    def __init__(self, event):
-        self.id = event['id']
-        self.room = event['room']
+    def __init__(self, json):
+        self.id = json['id']
+        self.room = json['room']
         self.speaker = {
-            'id': event['speaker_id'],
-            'name': event['nickname']
+            'id': json['speaker_id'],
+            'name': json['nickname']
         }
-        self.text = event['text']
-        self.time = dateutil.parser.parse(event['timestamp'])
+        self.text = json['text']
+        self.time = dateutil.parser.parse(json['timestamp'])
 
 class LingrBot:
     LINGR_SAY_URL = 'http://lingr.com/api/room/say'
@@ -27,7 +27,8 @@ class LingrBot:
     def _register(self, regexps, action):
         self.__listeners.append(regexps, action)
 
-    def receive(self, event):
+    def receive(self, json):
+        event = LingrEvent(json);
         for (res, act) in self.__listeners:
             for re in res:
                 if re.match(event.message):
