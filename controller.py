@@ -7,4 +7,4 @@ bot = CodeReadingBot()
 
 @code_reading.route('/', methods=['POST'])
 def create():
-    return bot.receive(request.json)
+    return bot.receive(request.json['events'][0])

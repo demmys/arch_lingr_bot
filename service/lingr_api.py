@@ -1,38 +1,46 @@
 import re
 import hashlib
 import urllib
-import dateutil
+import dateutil.parser
 
 class LingrEvent:
     def __init__(self, json):
-        self.id = json['id']
-        self.room = json['room']
-        self.speaker = {
-            'id': json['speaker_id'],
-            'name': json['nickname']
+        message = json['message']
+        self.__id = message['id']
+        self.__room = message['room']
+        self.__speaker = {
+            'id': message['speaker_id'],
+            'name': message['nickname']
         }
-        self.text = json['text']
-        self.time = dateutil.parser.parse(json['timestamp'])
+        self.__text = message['text']
+        self.__time = dateutil.parser.parse(message['timestamp'])
+
+    def text(self):
+        return self.__text
+
+    def match(self, regexp):
+        return re.match(regexp, self.__text)
 
 class LingrBot:
     LINGR_SAY_URL = 'http://lingr.com/api/room/say'
     __listeners = []
 
     def __init__(self, bot_id, bot_secret):
+        bot_verifier = (bot_id + bot_secret).encode('utf-8')
         self.__parameter = {
             'bot': bot_id,
-            'bot_verifier': hashlib.sha1(bot_id + obt_secret).hexdigest()
+            'bot_verifier': hashlib.sha1().hexdigest()
         }
 
     def _register(self, regexps, action):
-        self.__listeners.append(regexps, action)
+        self.__listeners.append((regexps, action))
 
     def receive(self, json):
-        event = LingrEvent(json);
-        for (res, act) in self.__listeners:
-            for re in res:
-                if re.match(event.message):
-                    return act(event)
+        event = LingrEvent(json)
+        for (regexps, action) in self.__listeners:
+            for regexp in regexps:
+                if event.match(regexp) is not None:
+                    return action(event)
 
     def send(self, room_id, text):
         self.__parameter['room_id'] = room_id
