@@ -4,7 +4,11 @@ from flask import Flask
 from controller import code_reading
 
 app = Flask(__name__)
-app.config.from_object('config.' + os.environ['LINGR_ENV'])
+if 'LINGR_ENV' in os.environ:
+    environment = os.environ['LINGR_ENV']
+else:
+    environment = 'Development'
+app.config.from_object('config.' + environment)
 
 app.register_blueprint(code_reading)
 
